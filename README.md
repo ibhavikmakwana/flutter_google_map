@@ -6,7 +6,7 @@ A Flutter application demonstrate google map.
 
 # Preview
 
-| Full Preview | Compass | MapTypes |
+| Listener and Marker | Compass | MapTypes |
 | ------------------ | ------------------ | ------------------ |
 | <img src="./preview/full_demo.gif" height="400" alt="Screenshot"/>  | <img src="./preview/compass.gif" height="400" alt="Screenshot"/>  | <img src="./preview/map_type.gif" height="400" alt="Screenshot"/>  |
 
