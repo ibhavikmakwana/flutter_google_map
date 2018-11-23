@@ -44,6 +44,8 @@ Specify your API key in the application manifest `android/app/src/main/AndroidMa
 
 Specify your API key in the application delegate `ios/Runner/AppDelegate.m`:
 
+#### Objective-C
+
 ```objectivec
 #include "AppDelegate.h"
 #include "GeneratedPluginRegistrant.h"
@@ -60,7 +62,8 @@ Specify your API key in the application delegate `ios/Runner/AppDelegate.m`:
 @end
 ```
 
-```Swift
+#### Swift
+```
 import UIKit
 import Flutter
 
