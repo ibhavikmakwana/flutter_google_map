@@ -66,6 +66,7 @@ Specify your API key in the application delegate `ios/Runner/AppDelegate.m`:
 ```
 import UIKit
 import Flutter
+import GoogleMaps
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
