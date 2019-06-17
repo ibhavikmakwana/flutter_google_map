@@ -40,11 +40,8 @@ class _MyMapState extends State<MyMap> {
   GoogleMapController _mapController;
   MapType _type = MapType.normal;
   Map<CircleId, Circle> circles = <CircleId, Circle>{};
-
-  static final _options = CameraPosition(
-    target: LatLng(23.0225, 72.5714),
-    zoom: 11,
-  );
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  Map<PolylineId, Polyline> polyLines = <PolylineId, Polyline>{};
 
   bool _nightMode = false;
 
@@ -53,7 +50,12 @@ class _MyMapState extends State<MyMap> {
     super.dispose();
   }
 
-  ///
+  static final _options = CameraPosition(
+    target: LatLng(23.0225, 72.5714),
+    zoom: 11,
+  );
+
+  ///Change the Type of the map on selection
   void _select(MapTypes types) {
     // Causes the app to rebuild with the selected choice.
     setState(() {
@@ -69,13 +71,14 @@ class _MyMapState extends State<MyMap> {
     });
   }
 
-  ///
+  ///Callback when map created
   void onMapCreated(GoogleMapController controller) {
     setState(() {
       _mapController = controller;
     });
   }
 
+  ///Get the night view json data for the night view.
   Future<String> _getFileData(String path) async {
     return await rootBundle.loadString(path);
   }
@@ -93,9 +96,7 @@ class _MyMapState extends State<MyMap> {
             icon: Icon(
               _nightMode ? Icons.brightness_3 : Icons.brightness_5,
             ),
-            onPressed: () {
-              _nightModeToggle();
-            },
+            onPressed: () => _nightModeToggle(),
           ),
           PopupMenuButton<MapTypes>(
             onSelected: _select,
@@ -110,21 +111,19 @@ class _MyMapState extends State<MyMap> {
           ),
         ],
       ),
-      body: Stack(
-        children: <Widget>[
-          GoogleMap(
-            initialCameraPosition: _options,
-            onMapCreated: onMapCreated,
-            mapType: _type,
-            circles:  Set<Circle>.of(circles.values),
-            myLocationEnabled: true,
-          ),
-//          InfoView(isMoving: _isMoving, position: _position),
-        ],
+      body: GoogleMap(
+        initialCameraPosition: _options,
+        onMapCreated: onMapCreated,
+        mapType: _type,
+        circles: Set<Circle>.of(circles.values),
+        myLocationEnabled: true,
+        polylines: Set<Polyline>.of(polyLines.values),
+        markers: Set<Marker>.of(markers.values),
       ),
     );
   }
 
+  ///Toggles to night mode and back to day mode
   void _nightModeToggle() {
     if (_nightMode) {
       setState(() {
@@ -141,6 +140,7 @@ class _MyMapState extends State<MyMap> {
     }
   }
 
+  ///Drawer list view
   mapDrawer() {
     return ListView(
       children: <Widget>[
@@ -151,6 +151,7 @@ class _MyMapState extends State<MyMap> {
     );
   }
 
+  //Create a Drawer widget list tile
   _createDrawerListTile(String listTitle, VoidCallback callback) {
     return ListTile(
       title: Text(listTitle),
@@ -158,95 +159,84 @@ class _MyMapState extends State<MyMap> {
     );
   }
 
+  ///Drop marker at the Ahmadabad
   void addMarker() {
-//    _mapController.clearMarkers();
-//    _mapController.addMarker(
-//      MarkerOptions(
-//        position: LatLng(23.0225, 72.5714),
-//        draggable: false,
-//        infoWindowText: InfoWindowText("Ahmedabad,", "India"),
-//        consumeTapEvents: true,
-//        icon: BitmapDescriptor.defaultMarker,
-//      ),
-//    );
+    if (markers.isNotEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    final Marker marker = Marker(
+      markerId: MarkerId("1"),
+      position: LatLng(23.0225, 72.5714),
+      infoWindow: InfoWindow(title: "Marker", snippet: 'Ahmedabad'),
+      onTap: () {
+        _onMarkerTapped(MarkerId("1"));
+      },
+    );
+    setState(() {
+      markers[MarkerId("1")] = marker;
+    });
+    Navigator.of(context).pop();
   }
 
+  ///Draw circle at the Ahmadabad
   void addCircle() {
+    if (circles.isNotEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
     final Circle circle = Circle(
       circleId: CircleId("1"),
       consumeTapEvents: true,
-      strokeColor: Colors.orange,
-      fillColor: Colors.green,
+      strokeColor: Colors.blueAccent.withOpacity(0.5),
+      fillColor: Colors.lightBlue.withOpacity(0.5),
+      center: LatLng(23.0225, 72.5714),
       strokeWidth: 5,
-      radius: 50000,
+      radius: 5000,
       onTap: () {},
     );
 
     setState(() {
       circles[CircleId("1")] = circle;
     });
+
+    Navigator.of(context).pop();
   }
 
-  void addPolyline() {}
+  void addPolyline() {
+    if (polyLines.isNotEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
 
-  ///Drop marker at the Ahmedabad
-//  void dropMarker() {
-//    mapController.clearMarkers();
-//    mapController.addMarker(
-//      MarkerOptions(
-//        position: LatLng(23.0225, 72.5714),
-//        draggable: false,
-//        infoWindowText: InfoWindowText("Ahmedabad,", "India"),
-//        consumeTapEvents: true,
-//        icon: BitmapDescriptor.defaultMarker,
-//      ),
-//    );
-//  }
+    final Polyline polyline = Polyline(
+      polylineId: PolylineId("1"),
+      consumeTapEvents: true,
+      color: Colors.blueAccent,
+      width: 5,
+      points: [
+        LatLng(23.0225, 72.5714),
+        LatLng(22.3072, 73.1812),
+        LatLng(21.1702, 72.8311),
+      ],
+      onTap: () {
+        _onPolylineTapped(PolylineId("1"));
+      },
+    );
+
+    setState(() {
+      polyLines[PolylineId("1")] = polyline;
+    });
+
+    Navigator.of(context).pop();
+  }
+
+  void _onMarkerTapped(MarkerId markerId) {
+    print("Marker $markerId Tapped!");
+  }
+
+  void _onPolylineTapped(PolylineId polylineId) {
+    print("Polyline $polylineId Tapped!");
+  }
 }
-
-//class InfoView extends StatelessWidget {
-//  const InfoView({
-//    Key key,
-//    @required bool isMoving,
-//    @required CameraPosition position,
-//  })  : _isMoving = isMoving,
-//        _position = position,
-//        super(key: key);
-//
-//  final bool _isMoving;
-//  final CameraPosition _position;
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return Align(
-//      alignment: Alignment.bottomRight,
-//      child: Container(
-//        width: double.infinity,
-//        margin: EdgeInsets.all(8.0),
-//        decoration: BoxDecoration(
-//          borderRadius: BorderRadius.circular(8.0),
-//          color: Colors.white,
-//        ),
-//        child: Column(
-//          mainAxisSize: MainAxisSize.min,
-//          children: <Widget>[
-//            Padding(
-//              padding: const EdgeInsets.all(8.0),
-//              child: Text(
-//                _isMoving ? "Map is moving" : "Map is Idle",
-//                style: TextStyle(fontSize: 24.0),
-//              ),
-//            ),
-//            Padding(
-//              padding: const EdgeInsets.all(8.0),
-//              child: Text(
-//                _position != null ? _position.target.toString() : "",
-//                style: TextStyle(fontSize: 24.0),
-//              ),
-//            ),
-//          ],
-//        ),
-//      ),
-//    );
-//  }
-//}
