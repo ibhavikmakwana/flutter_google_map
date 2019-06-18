@@ -18,10 +18,7 @@ A Flutter application demonstrate google map.
 
 To use this plugin, add
 ```yaml
- google_maps_flutter:
-   git:
-     url: git://github.com/flutter/plugins
-     path: packages/google_maps_flutter
+ google_maps_flutter: latest_version
 ```
 as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
 
